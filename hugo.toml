@@ -1,7 +1,37 @@
-baseURL = "https://carywoods.dev/biobook"
+baseURL = "/"
 languageCode = "en-us"
 title = "Bioinformatics with AI"
-theme = "bioinformatics-book-theme"
+theme = "hugo-book"
 
+# Book theme: render child pages of this section as the sidebar menu.
+disablePathToLower = true
+
+# relativeURLs makes the built site portable: it works at a bare domain, a
+# subpath, or a Coolify-generated hostname without rebuilding.
+relativeURLs = true
+canonifyURLs = false
+
+[markup]
 [markup.goldmark.renderer]
   unsafe = true
+
+[markup.tableOfContents]
+  startLevel = 1
+  endLevel = 3
+
+[markup.highlight]
+  style = "base16-snazzy"
+  noClasses = false
+
+[params]
+  # light | dark | auto
+  BookTheme = "light"
+  # Show table of contents on the right of each page
+  BookToC = true
+  # Root section rendered as the sidebar menu
+  BookSection = "docs"
+  # Enable fuse.js client-side search
+  BookSearch = true
+  # No Disqus comments for a textbook
+  BookComments = false
+  BookDateFormat = "January 2, 2006"

@@ -1,11 +1,9 @@
-# Hugo build output — committed so Coolify Static pack serves it prebuilt
-# public/
-resources/_gen/
-
-# Lock/temp
+# Hugo build output (built by CI/Docker, not committed)
+public/
+resources/
 .hugo_build.lock
 
-# Local staging of published output
+# Local staging
 staging/
 
 # Logs & OS cruft
@@ -16,5 +14,7 @@ staging/
 *.swp
 *~
 .idea/
-# Stray 9-byte placeholder, not a real theme
+.vscode/
+
+# Stray archives (never a real theme)
 themes/*.zip

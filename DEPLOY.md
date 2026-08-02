@@ -1,25 +1,47 @@
-# Deploying this Hugo documentation site (Coolify — static)
+# Deploying to Coolify
 
-This is the organization's **standard method** for publishing Hugo documentation sites:
-serve the built static output directly — no Dockerfile needed.
+## Recommended: Dockerfile build pack
 
-## Deploy in Coolify
-1. Push this repo to GitHub (`carywoods/biobook2`).
-2. Coolify → New Resource → application → point at the repo.
-3. Build pack: **Static** (Coolify auto-detects Hugo).
-4. Output directory: **`public`** (where `hugo` writes the site).
-5. Set the domain (e.g. `carywoods.dev/biobook`).
-6. Deploy.
+The repo ships a `Dockerfile` that builds the site and serves it with nginx.
 
-Coolify runs the Hugo build itself and serves `public/` with its own server,
-wiring the port automatically. No Dockerfile, no nginx, no build args.
+In Coolify:
 
-## Local preview
+1. **New Resource → Application**, point at `github.com/carywoods/biobook2`
+2. **Build Pack: `Dockerfile`**
+3. **Port: `80`**
+4. Set your domain
+5. Deploy
+
+No build arguments needed. `relativeURLs = true` in `hugo.toml` makes the output
+work at whatever URL Coolify serves it from.
+
+### Why a Dockerfile and not the Static build pack
+
+The Static pack must detect and run Hugo itself, and it has to be the
+**extended** build at **>= 0.158.0** for the hugo-book theme. Pinning the exact
+Hugo version in the Dockerfile removes that uncertainty.
+
+## Troubleshooting
+
+**Seeing the default nginx welcome page?**
+That means nginx is serving an empty webroot. The Dockerfile now guards against
+this: it fails the build if `public/index.html` is missing, and deletes nginx's
+stock page. If you still see it:
+- Confirm Coolify used the **Dockerfile** build pack (not Static/Nixpacks)
+- Confirm the deployed commit is the one you expect
+- Check the build log for the line `Built N HTML pages`
+
+**Unstyled page (text only, no sidebar)?**
+The theme did not reach the build. Confirm `themes/hugo-book/` is present in the
+repo (it is vendored, not a submodule). The Dockerfile fails early if it is missing.
+
+**Build fails on the Hugo binary with `libstdc++.so.6 not found`?**
+The build stage must be a glibc base (Debian). Hugo extended will not run on
+musl/Alpine. The provided Dockerfile already uses `debian:bookworm-slim`.
+
+## Local verification before deploying
+
 ```bash
-hugo server
+hugo --minify --gc
+test -f public/index.html && echo OK
 ```
-
-## Note on baseURL
-`hugo.toml` sets `baseURL = "https://carywoods.dev/biobook"`. Hugo renders
-root-relative paths (`/biobook/...`), so set the same domain/path in Coolify so
-links resolve. If serving at a bare domain, change/baseURL override accordingly.
