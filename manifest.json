@@ -1,0 +1,15 @@
+{
+  "name": "Bioinformatics with AI",
+  "short_name": "Bioinformatics with AI",
+  "start_url": "/biobook2/",
+  "scope": "/biobook2/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/biobook2/favicon.svg",
+      "sizes": "512x512"
+    }
+  ]
+}
