@@ -1,0 +1,449 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Chapter 4: Biological Data - Bioinformatics with AI</title>
+<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel=stylesheet><style>*{box-sizing:border-box}body{margin:0;padding:0;font-family:inter,-apple-system,BlinkMacSystemFont,segoe ui,Roboto,sans-serif;background-color:#f8fafc;color:#1e293b;line-height:1.75}header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid #e2e8f0;padding:.75rem 2rem;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,5%)}.layout-container{display:flex;margin-top:64px;min-height:calc(100vh - 64px)}nav.sidebar{position:sticky;top:64px;width:240px;background:rgba(255,255,255,.95);border-right:1px solid #e2e8f0;padding:1.5rem 1rem;overflow-y:auto;height:calc(100vh - 64px)}nav.sidebar a{display:block;padding:.75rem 1rem;margin-bottom:.25rem;text-decoration:none;color:#475569;border-radius:.5rem;font-size:.9rem;transition:all .2s ease}nav.sidebar a:hover{background:#eff6ff;color:#0ea5e9}nav.sidebar a.active{background:#dbeafe;color:#0c4a6e;font-weight:600}main{flex:1;max-width:min(75rem,calc(100% - 240px));margin:0 auto;padding:2rem 3rem}h1{font-size:2.5rem;font-weight:800;line-height:1.2;margin-top:2em;color:#0f172a;border-bottom:3px solid #cbd5e1;padding-bottom:.5em}h2{font-size:1.875rem;font-weight:700;line-height:1.3;margin-top:2em;color:#1e293b;border-bottom:1px solid #e2e8f0;padding-bottom:.25em}h3{font-size:1.5rem;font-weight:600;line-height:1.4;margin-top:1.8em;color:#2d3748}pre{background:#1e293b;color:#cbd5e1;border-radius:.75rem;padding:1.25rem;overflow-x:auto;margin:1.5em 0;font-size:.875rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}pre code{background:0 0;color:inherit;padding:0;font-family:fira code,monospace}code{background:#f1f5f9;color:#0c4a6e;padding:.2em .45rem;border-radius:.375rem;font-size:.875em;font-family:fira code,monospace}table{width:100%;border-collapse:separate;border-spacing:0;margin:1.75em 0}th,td{padding:.75rem 1rem;border-bottom:1px solid #e2e8f0}thead tr{background:#f8fafc}.callout{border-left:4px solid;padding:1rem 1.25rem;margin:1.75em 0;border-radius:0 .75rem .75rem 0;background:#f8fafc}.callout.tip{border-color:#10b981}.callout.warning{border-color:#f59e0b}footer{border-top:1px solid #e2e8f0;padding:1.5rem 3rem;margin-top:4rem;text-align:center;color:#64748b;font-size:.875rem}@media(max-width:1024px){.layout-container{display:block}nav.sidebar{display:none}main{max-width:calc(100% - 2rem);padding:1.5rem}}@media(max-width:768px){header{padding:.75rem 1rem}h1{font-size:2rem}main{max-width:calc(100% - 2rem);padding:1rem}}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}</style></head><body><header class="border-b border-gray-200"><div style="max-width:85rem;margin:0 auto;padding:.75rem 2rem"><a href=/ class="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors">Bioinformatics with AI</a></div></header><div class=layout-container><main id=content><article class="prose prose-lg max-w-none"><p>Bioinformatics runs on structured data. Gene annotations, variant calls, protein databases, and sequence alignments all follow specific formats. This chapter teaches you to parse and work with biological data formats.</p><p>You will learn to handle GenBank and FASTA formats using BioPython, extract features from sequence records, and write sequences to files. These skills are the bridge between raw data and biological insight.</p><p>Every tool in bioinformatics depends on parsing structured data correctly. This chapter gives you that foundation.</p><h2 id=reading-biological-file-formats>Reading Biological File Formats</h2><p>BioPython&rsquo;s SeqIO module handles multiple file formats: FASTA, GenBank, and more. This script reads sequences from different formats and extracts key information.</p><p><strong>Vanilla version</strong> (<code>ch04_vanilla_01.py</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio <span style=color:#f92672>import</span> SeqIO
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>parse_genbank</span>(filename: str) <span style=color:#f92672>-&gt;</span> <span style=color:#66d9ef>None</span>:
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;&#34;&#34;Parse a GenBank file and display its contents.&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>    record <span style=color:#f92672>=</span> SeqIO<span style=color:#f92672>.</span>read(filename, <span style=color:#e6db74>&#34;genbank&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Basic information</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;ID:          </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Name:        </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>name<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Description: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>description<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Length:       </span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>seq)<span style=color:#e6db74>}</span><span style=color:#e6db74> bases&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Molecule:     </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;molecule_type&#39;</span>, <span style=color:#e6db74>&#39;unknown&#39;</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Organism:     </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;organism&#39;</span>, <span style=color:#e6db74>&#39;unknown&#39;</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Sequence</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Sequence (first 60 bases):&#34;</span>)
+</span></span><span style=display:flex><span>    seq_str <span style=color:#f92672>=</span> str(record<span style=color:#f92672>.</span>seq)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, min(<span style=color:#ae81ff>60</span>, len(seq_str)), <span style=color:#ae81ff>60</span>):
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>seq_str[i:i<span style=color:#f92672>+</span><span style=color:#ae81ff>60</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Features</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Features (</span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>features)<span style=color:#e6db74>}</span><span style=color:#e6db74> total):&#34;</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> feature <span style=color:#f92672>in</span> record<span style=color:#f92672>.</span>features[:<span style=color:#ae81ff>10</span>]:  <span style=color:#75715e># Show first 10</span>
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>feature<span style=color:#f92672>.</span>type<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>feature<span style=color:#f92672>.</span>location<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#34;gene&#34;</span> <span style=color:#f92672>in</span> feature<span style=color:#f92672>.</span>qualifiers:
+</span></span><span style=display:flex><span>            print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;    Gene: </span><span style=color:#e6db74>{</span>feature<span style=color:#f92672>.</span>qualifiers[<span style=color:#e6db74>&#39;gene&#39;</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#34;product&#34;</span> <span style=color:#f92672>in</span> feature<span style=color:#f92672>.</span>qualifiers:
+</span></span><span style=display:flex><span>            print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;    Product: </span><span style=color:#e6db74>{</span>feature<span style=color:#f92672>.</span>qualifiers[<span style=color:#e6db74>&#39;product&#39;</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> len(record<span style=color:#f92672>.</span>features) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>10</span>:
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  ... and </span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>features) <span style=color:#f92672>-</span> <span style=color:#ae81ff>10</span><span style=color:#e6db74>}</span><span style=color:#e6db74> more features&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># References</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>References (</span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;references&#39;</span>, []))<span style=color:#e6db74>}</span><span style=color:#e6db74>):&#34;</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> ref <span style=color:#f92672>in</span> record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;references&#34;</span>, []):
+</span></span><span style=display:flex><span>        print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>ref<span style=color:#f92672>.</span>title[:<span style=color:#ae81ff>80</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>...&#34;</span> <span style=color:#66d9ef>if</span> ref<span style=color:#f92672>.</span>title <span style=color:#f92672>and</span> len(ref<span style=color:#f92672>.</span>title) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>80</span> <span style=color:#66d9ef>else</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>ref<span style=color:#f92672>.</span>title<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># --- Main program ---</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Use a sample GenBank file if available, otherwise create one</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> tempfile
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>SAMPLE_GENBANK <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;&#34;</span><span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span><span style=color:#e6db74>LOCUS       SAMPLE_SEQ              576 bp    DNA     linear   PRI 01-JAN-2026
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>DEFINITION  Homo sapiens hemoglobin subunit beta (HBB) partial sequence.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ACCESSION   SAMPLE001
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>VERSION     SAMPLE001.1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>KEYWORDS    .
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>SOURCE      Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  ORGANISM  Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Mammalia; Eutheria; Euarchontoglires; Primates; Haplorrhini;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Catarrhini; Hominidae; Homo.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>FEATURES             Location/Qualifiers
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     source          1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /organism=&#34;Homo sapiens&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /mol_type=&#34;genomic DNA&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     gene            1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     CDS             1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /product=&#34;hemoglobin subunit beta&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /translation=&#34;MVHLTPEEKSAVTALWGKVNVDEVGGEALGRLLVVYPWTQRFFES
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     FGDLSTPDAVMGNPKVKAHGKKVLGAFSDGLAHLDNLKGTFATLSELHCDKLHVDPE
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     NFRLLGNVLVCVLAHHFGKEFTPPVQAAYQKVVAGVANALAHKYH&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ORIGIN
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        1 atggtgcatc tgactcctga ggagaagtct gccgttactg ccctgtgggg caaggtgaac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>       61 gtggatgaag ttggtggtga ggccctgggc aggctgctgg tggtctaccc ttggacccag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      121 aggttctttg agtcctttgg ggatctgtcc actcctgatg ctgttatggg caaccctaag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      181 gtgaaggctc atggcaagaa agtgctcggt gcctttagtg atggcctggc tcacctggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      241 aacctcaagg gcacctttgc cacactgagt gagctgcact gtgacaagct gcacgtggat
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      301 cctgagaact tcagggagcc tctgccatgc tggatacatt catcacccag aatccaggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      361 tccagccttc tgggcatcat tctgaccctc agctgcctcc aggtcctctg cttgagcttc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      421 cctttctgtt tcctgtccaa tctgctccca cccatggcta ttgagacact cttgttccct
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      481 cctctgctga tgtggaagct gaaggtgctg gacttcatca cctttgccaa cctgctgggt
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      541 gccctgtgga tgaactatgg caagaacttc atgacc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>//
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write sample file</span>
+</span></span><span style=display:flex><span>sample_file <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(tempfile<span style=color:#f92672>.</span>gettempdir(), <span style=color:#e6db74>&#34;sample.gb&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(sample_file, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(SAMPLE_GENBANK)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Parsing sample GenBank file: </span><span style=color:#e6db74>{</span>sample_file<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>parse_genbank(sample_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Clean up</span>
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>remove(sample_file)
+</span></span></code></pre></div><p>We used Bio.SeqIO to parse sequences, access record attributes (id, description, seq), and handle different file formats with the same API.</p><p><strong>AI version</strong> (<code>ch04_ai_01.py</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> tempfile
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio <span style=color:#f92672>import</span> SeqIO
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>from</span> openai <span style=color:#f92672>import</span> OpenAI
+</span></span><span style=display:flex><span>    client <span style=color:#f92672>=</span> OpenAI(
+</span></span><span style=display:flex><span>        api_key<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_API_KEY&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>),
+</span></span><span style=display:flex><span>        base_url<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_BASE_URL&#34;</span>, <span style=color:#e6db74>&#34;https://openrouter.ai/api/v1&#34;</span>),
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>    AI_AVAILABLE <span style=color:#f92672>=</span> <span style=color:#66d9ef>True</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>ImportError</span>:
+</span></span><span style=display:flex><span>    AI_AVAILABLE <span style=color:#f92672>=</span> <span style=color:#66d9ef>False</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;Note: Install openai package for AI features (pip install openai)</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>ask_ai</span>(prompt: str) <span style=color:#f92672>-&gt;</span> str:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> AI_AVAILABLE:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;(AI not available -- set OPENAI_API_KEY environment variable)&#34;</span>
+</span></span><span style=display:flex><span>    response <span style=color:#f92672>=</span> client<span style=color:#f92672>.</span>chat<span style=color:#f92672>.</span>completions<span style=color:#f92672>.</span>create(
+</span></span><span style=display:flex><span>        model<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_MODEL&#34;</span>, <span style=color:#e6db74>&#34;google/gemini-2.5-flash&#34;</span>),
+</span></span><span style=display:flex><span>        messages<span style=color:#f92672>=</span>[{<span style=color:#e6db74>&#34;role&#34;</span>: <span style=color:#e6db74>&#34;user&#34;</span>, <span style=color:#e6db74>&#34;content&#34;</span>: prompt}],
+</span></span><span style=display:flex><span>        temperature<span style=color:#f92672>=</span><span style=color:#ae81ff>0.3</span>,
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> response<span style=color:#f92672>.</span>choices[<span style=color:#ae81ff>0</span>]<span style=color:#f92672>.</span>message<span style=color:#f92672>.</span>content
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>SAMPLE_GENBANK <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;&#34;</span><span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span><span style=color:#e6db74>LOCUS       SAMPLE_SEQ              576 bp    DNA     linear   PRI 01-JAN-2026
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>DEFINITION  Homo sapiens hemoglobin subunit beta (HBB) partial sequence.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ACCESSION   SAMPLE001
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>VERSION     SAMPLE001.1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>KEYWORDS    .
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>SOURCE      Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  ORGANISM  Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Mammalia; Eutheria; Euarchontoglires; Primates; Haplorrhini;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Catarrhini; Hominidae; Homo.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>FEATURES             Location/Qualifiers
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     source          1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /organism=&#34;Homo sapiens&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /mol_type=&#34;genomic DNA&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     gene            1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     CDS             1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /product=&#34;hemoglobin subunit beta&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /translation=&#34;MVHLTPEEKSAVTALWGKVNVDEVGGEALGRLLVVYPWTQRFFES
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     FGDLSTPDAVMGNPKVKAHGKKVLGAFSDGLAHLDNLKGTFATLSELHCDKLHVDPE
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     NFRLLGNVLVCVLAHHFGKEFTPPVQAAYQKVVAGVANALAHKYH&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ORIGIN
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        1 atggtgcatc tgactcctga ggagaagtct gccgttactg ccctgtgggg caaggtgaac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>       61 gtggatgaag ttggtggtga ggccctgggc aggctgctgg tggtctaccc ttggacccag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      121 aggttctttg agtcctttgg ggatctgtcc actcctgatg ctgttatggg caaccctaag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      181 gtgaaggctc atggcaagaa agtgctcggt gcctttagtg atggcctggc tcacctggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      241 aacctcaagg gcacctttgc cacactgagt gagctgcact gtgacaagct gcacgtggat
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      301 cctgagaact tcagggagcc tctgccatgc tggatacatt catcacccag aatccaggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      361 tccagccttc tgggcatcat tctgaccctc agctgcctcc aggtcctctg cttgagcttc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      421 cctttctgtt tcctgtccaa tctgctccca cccatggcta ttgagacact cttgttccct
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      481 cctctgctga tgtggaagct gaaggtgctg gacttcatca cctttgccaa cctgctgggt
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      541 gccctgtgga tgaactatgg caagaacttc atgacc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>//
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write sample file</span>
+</span></span><span style=display:flex><span>sample_file <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(tempfile<span style=color:#f92672>.</span>gettempdir(), <span style=color:#e6db74>&#34;sample.gb&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(sample_file, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(SAMPLE_GENBANK)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Parse with BioPython</span>
+</span></span><span style=display:flex><span>record <span style=color:#f92672>=</span> SeqIO<span style=color:#f92672>.</span>read(sample_file, <span style=color:#e6db74>&#34;genbank&#34;</span>)
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>remove(sample_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Display basics (same as vanilla)</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;ID:          </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Description: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>description<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Length:       </span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>seq)<span style=color:#e6db74>}</span><span style=color:#e6db74> bases&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Organism:     </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;organism&#39;</span>, <span style=color:#e6db74>&#39;unknown&#39;</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Features:     </span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>features)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Collect feature summary for AI</span>
+</span></span><span style=display:flex><span>feature_summary <span style=color:#f92672>=</span> []
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> f <span style=color:#f92672>in</span> record<span style=color:#f92672>.</span>features:
+</span></span><span style=display:flex><span>    info <span style=color:#f92672>=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>f<span style=color:#f92672>.</span>type<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>f<span style=color:#f92672>.</span>location<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#34;gene&#34;</span> <span style=color:#f92672>in</span> f<span style=color:#f92672>.</span>qualifiers:
+</span></span><span style=display:flex><span>        info <span style=color:#f92672>+=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34; (gene=</span><span style=color:#e6db74>{</span>f<span style=color:#f92672>.</span>qualifiers[<span style=color:#e6db74>&#39;gene&#39;</span>][<span style=color:#ae81ff>0</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>)&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#e6db74>&#34;product&#34;</span> <span style=color:#f92672>in</span> f<span style=color:#f92672>.</span>qualifiers:
+</span></span><span style=display:flex><span>        info <span style=color:#f92672>+=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34; (product=</span><span style=color:#e6db74>{</span>f<span style=color:#f92672>.</span>qualifiers[<span style=color:#e6db74>&#39;product&#39;</span>][<span style=color:#ae81ff>0</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>)&#34;</span>
+</span></span><span style=display:flex><span>    feature_summary<span style=color:#f92672>.</span>append(info)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>features_text <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span><span style=color:#f92672>.</span>join(feature_summary)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># --- AI: Explain the GenBank record ---</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>--- AI: What does this GenBank record tell us? ---</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>result <span style=color:#f92672>=</span> ask_ai(
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;I parsed a GenBank record for a DNA sequence. Here&#39;s the summary:</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;ID: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Description: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>description<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Organism: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;organism&#39;</span>, <span style=color:#e6db74>&#39;unknown&#39;</span>)<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Length: </span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>seq)<span style=color:#e6db74>}</span><span style=color:#e6db74> bases</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Features:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>{</span>features_text<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;Please explain for a college student:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;1. What is a GenBank record? Why do scientists submit sequences to it?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;2. What does each feature type mean (source, gene, CDS)?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;3. What is hemoglobin subunit beta, and why is it important?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;4. The CDS has a /translation qualifier. Why is that useful?</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;Keep it brief and use analogies where possible.&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>print(result)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># --- AI: Downstream analysis suggestions ---</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>--- AI: What should we do next with this sequence? ---</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>result <span style=color:#f92672>=</span> ask_ai(
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;I have a GenBank record for human hemoglobin beta (</span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>seq)<span style=color:#e6db74>}</span><span style=color:#e6db74> bases).</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;The protein sequence is:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>features[<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>]<span style=color:#f92672>.</span>qualifiers<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;translation&#39;</span>, [<span style=color:#e6db74>&#39;&#39;</span>])[<span style=color:#ae81ff>0</span>]<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;As a bioinformatics instructor, suggest 3 analyses a student could do next:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;1. A simple analysis they could do in 5 minutes</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;2. A medium-difficulty analysis for a homework assignment</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;3. A challenging analysis for a class project</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;For each, name the tool or database they would use.&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>print(result)
+</span></span></code></pre></div><p>The AI interprets the parsed records: what the accession numbers mean, what organisms the sequences come from, and how to navigate between formats.</p><p>::: {.callout-tip}
+You can run any vanilla script without an API key. The AI scripts will print a message and run in offline mode if no key is set.
+:::</p><h2 id=genbank-records-and-feature-extraction>GenBank Records and Feature Extraction</h2><p>GenBank records contain rich annotation: gene names, features, qualifiers, and references. This script parses GenBank records and extracts biological features.</p><p><strong>Vanilla version</strong> (<code>ch04_vanilla_02.py</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> tempfile
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio <span style=color:#f92672>import</span> SeqIO
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>SAMPLE_GENBANK <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;&#34;</span><span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span><span style=color:#e6db74>LOCUS       HBB_GENE                576 bp    DNA     linear   PRI 01-JAN-2026
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>DEFINITION  Homo sapiens hemoglobin subunit beta (HBB) partial sequence.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ACCESSION   SAMPLE001
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>SOURCE      Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  ORGANISM  Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Mammalia; Eutheria; Primates; Haplorrhini; Hominidae; Homo.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>FEATURES             Location/Qualifiers
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     source          1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /organism=&#34;Homo sapiens&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /mol_type=&#34;genomic DNA&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     gene            1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     CDS             1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /product=&#34;hemoglobin subunit beta&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ORIGIN
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        1 atggtgcatc tgactcctga ggagaagtct gccgttactg ccctgtgggg caaggtgaac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>       61 gtggatgaag ttggtggtga ggccctgggc aggctgctgg tggtctaccc ttggacccag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      121 aggttctttg agtcctttgg ggatctgtcc actcctgatg ctgttatggg caaccctaag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      181 gtgaaggctc atggcaagaa agtgctcggt gcctttagtg atggcctggc tcacctggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      241 aacctcaagg gcacctttgc cacactgagt gagctgcact gtgacaagct gcacgtggat
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      301 cctgagaact tcagggagcc tctgccatgc tggatacatt catcacccag aatccaggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      361 tccagccttc tgggcatcat tctgaccctc agctgcctcc aggtcctctg cttgagcttc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      421 cctttctgtt tcctgtccaa tctgctccca cccatggcta ttgagacact cttgttccct
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      481 cctctgctga tgtggaagct gaaggtgctg gacttcatca cctttgccaa cctgctgggt
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      541 gccctgtgga tgaactatgg caagaacttc atgacc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>//
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sample_file <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(tempfile<span style=color:#f92672>.</span>gettempdir(), <span style=color:#e6db74>&#34;hbb.gb&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(sample_file, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(SAMPLE_GENBANK)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>record <span style=color:#f92672>=</span> SeqIO<span style=color:#f92672>.</span>read(sample_file, <span style=color:#e6db74>&#34;genbank&#34;</span>)
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>remove(sample_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show the full annotation</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;=== ANNOTATION ===&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;ID: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Description: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>description<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Organism: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;organism&#39;</span>, <span style=color:#e6db74>&#39;unknown&#39;</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Topology: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>annotations<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#39;topology&#39;</span>, <span style=color:#e6db74>&#39;unknown&#39;</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show each feature with its qualifiers</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>=== FEATURES ===&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> feature <span style=color:#f92672>in</span> record<span style=color:#f92672>.</span>features:
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>  Type: </span><span style=color:#e6db74>{</span>feature<span style=color:#f92672>.</span>type<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  Location: </span><span style=color:#e6db74>{</span>feature<span style=color:#f92672>.</span>location<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> key, values <span style=color:#f92672>in</span> feature<span style=color:#f92672>.</span>qualifiers<span style=color:#f92672>.</span>items():
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> val <span style=color:#f92672>in</span> values:
+</span></span><span style=display:flex><span>            print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;    </span><span style=color:#e6db74>{</span>key<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>val<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Show the raw sequence</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>=== SEQUENCE (</span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>seq)<span style=color:#e6db74>}</span><span style=color:#e6db74> bp) ===&#34;</span>)
+</span></span><span style=display:flex><span>seq <span style=color:#f92672>=</span> str(record<span style=color:#f92672>.</span>seq)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, len(seq), <span style=color:#ae81ff>60</span>):
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>i<span style=color:#f92672>+</span><span style=color:#ae81ff>1</span><span style=color:#e6db74>:</span><span style=color:#e6db74>4d</span><span style=color:#e6db74>}</span><span style=color:#e6db74> </span><span style=color:#e6db74>{</span>seq[i:i<span style=color:#f92672>+</span><span style=color:#ae81ff>60</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span></code></pre></div><p>We accessed SeqRecord features, extracted CDS and gene annotations, and used qualifier dictionaries to get gene names and protein products.</p><p><strong>AI version</strong> (<code>ch04_ai_02.py</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> tempfile
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio <span style=color:#f92672>import</span> SeqIO
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>from</span> openai <span style=color:#f92672>import</span> OpenAI
+</span></span><span style=display:flex><span>    client <span style=color:#f92672>=</span> OpenAI(api_key<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_API_KEY&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>), base_url<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_BASE_URL&#34;</span>, <span style=color:#e6db74>&#34;https://openrouter.ai/api/v1&#34;</span>))
+</span></span><span style=display:flex><span>    AI_AVAILABLE <span style=color:#f92672>=</span> <span style=color:#66d9ef>True</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>ImportError</span>:
+</span></span><span style=display:flex><span>    AI_AVAILABLE <span style=color:#f92672>=</span> <span style=color:#66d9ef>False</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;Note: Install openai package for AI features</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>ask_ai</span>(prompt: str) <span style=color:#f92672>-&gt;</span> str:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> AI_AVAILABLE:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;(AI not available)&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> client<span style=color:#f92672>.</span>chat<span style=color:#f92672>.</span>completions<span style=color:#f92672>.</span>create(model<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_MODEL&#34;</span>, <span style=color:#e6db74>&#34;google/gemini-2.5-flash&#34;</span>), messages<span style=color:#f92672>=</span>[{<span style=color:#e6db74>&#34;role&#34;</span>: <span style=color:#e6db74>&#34;user&#34;</span>, <span style=color:#e6db74>&#34;content&#34;</span>: prompt}], temperature<span style=color:#f92672>=</span><span style=color:#ae81ff>0.3</span>)<span style=color:#f92672>.</span>choices[<span style=color:#ae81ff>0</span>]<span style=color:#f92672>.</span>message<span style=color:#f92672>.</span>content
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>SAMPLE_GENBANK <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;&#34;</span><span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span><span style=color:#e6db74>LOCUS       HBB_GENE                576 bp    DNA     linear   PRI 01-JAN-2026
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>DEFINITION  Homo sapiens hemoglobin subunit beta (HBB) partial sequence.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ACCESSION   SAMPLE001
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>SOURCE      Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  ORGANISM  Homo sapiens
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            Mammalia; Eutheria; Primates; Haplorrhini; Hominidae; Homo.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>FEATURES             Location/Qualifiers
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     source          1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /organism=&#34;Homo sapiens&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     gene            1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     CDS             1..576
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /gene=&#34;HBB&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                     /product=&#34;hemoglobin subunit beta&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>ORIGIN
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        1 atggtgcatc tgactcctga ggagaagtct gccgttactg ccctgtgggg caaggtgaac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>       61 gtggatgaag ttggtggtga ggccctgggc aggctgctgg tggtctaccc ttggacccag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      121 aggttctttg agtcctttgg ggatctgtcc actcctgatg ctgttatggg caaccctaag
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      181 gtgaaggctc atggcaagaa agtgctcggt gcctttagtg atggcctggc tcacctggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      241 aacctcaagg gcacctttgc cacactgagt gagctgcact gtgacaagct gcacgtggat
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      301 cctgagaact tcagggagcc tctgccatgc tggatacatt catcacccag aatccaggac
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      361 tccagccttc tgggcatcat tctgaccctc agctgcctcc aggtcctctg cttgagcttc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      421 cctttctgtt tcctgtccaa tctgctccca cccatggcta ttgagacact cttgttccct
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      481 cctctgctga tgtggaagct gaaggtgctg gacttcatca cctttgccaa cctgctgggt
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>      541 gccctgtgga tgaactatgg caagaacttc atgacc
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>//
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sample_file <span style=color:#f92672>=</span> os<span style=color:#f92672>.</span>path<span style=color:#f92672>.</span>join(tempfile<span style=color:#f92672>.</span>gettempdir(), <span style=color:#e6db74>&#34;hbb.gb&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>with</span> open(sample_file, <span style=color:#e6db74>&#34;w&#34;</span>) <span style=color:#66d9ef>as</span> f:
+</span></span><span style=display:flex><span>    f<span style=color:#f92672>.</span>write(SAMPLE_GENBANK)
+</span></span><span style=display:flex><span>record <span style=color:#f92672>=</span> SeqIO<span style=color:#f92672>.</span>read(sample_file, <span style=color:#e6db74>&#34;genbank&#34;</span>)
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>remove(sample_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Parsed: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74> -- </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>description<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Features: </span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>features)<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Build feature summary</span>
+</span></span><span style=display:flex><span>feature_text <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> f <span style=color:#f92672>in</span> record<span style=color:#f92672>.</span>features:
+</span></span><span style=display:flex><span>    feature_text <span style=color:#f92672>+=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>f<span style=color:#f92672>.</span>type<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>f<span style=color:#f92672>.</span>location<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> k, v <span style=color:#f92672>in</span> f<span style=color:#f92672>.</span>qualifiers<span style=color:#f92672>.</span>items():
+</span></span><span style=display:flex><span>        feature_text <span style=color:#f92672>+=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;    </span><span style=color:#e6db74>{</span>k<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>v[<span style=color:#ae81ff>0</span>]<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>--- AI: What do these GenBank features mean? ---</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>result <span style=color:#f92672>=</span> ask_ai(
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;A GenBank record for </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74> has these features:</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>{</span>feature_text<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;Explain for a college student:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;1. What is the difference between &#39;source&#39;, &#39;gene&#39;, and &#39;CDS&#39; features?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;2. What does /mol_type=&#39;genomic DNA&#39; tell us?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;3. Why is the CDS feature important? What would happen if it were wrong?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;4. How do scientists verify that a GenBank annotation is correct?</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;Use the analogy of a library catalog entry.&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>print(result)
+</span></span></code></pre></div><p>The AI explains the biological significance of GenBank features: what CDS regions mean, how gene annotations work, and what the qualifiers tell us about function.</p><p>::: {.callout-note}
+The AI version always includes the same core logic as the vanilla version. The AI calls are added at the end, so you can compare the two approaches side by side.
+:::</p><h2 id=writing-sequences-and-format-conversion>Writing Sequences and Format Conversion</h2><p>Converting between formats and writing output files is a core bioinformatics task. This script writes sequences to FASTA and performs format conversion.</p><p><strong>Vanilla version</strong> (<code>ch04_vanilla_03.py</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio.SeqRecord <span style=color:#f92672>import</span> SeqRecord
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio.Seq <span style=color:#f92672>import</span> Seq
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Create sequence records</span>
+</span></span><span style=display:flex><span>sequences <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    SeqRecord(Seq(<span style=color:#e6db74>&#34;ATGGTGCATCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAAC&#34;</span>),
+</span></span><span style=display:flex><span>              id<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;seq001&#34;</span>, description<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;hemoglobin beta fragment 1&#34;</span>),
+</span></span><span style=display:flex><span>    SeqRecord(Seq(<span style=color:#e6db74>&#34;GTGGATGAAGTTGGTGGTGAGGCCCTGGGCAGGCTGCTGGTGGTCTACCCTTGGACCCAG&#34;</span>),
+</span></span><span style=display:flex><span>              id<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;seq002&#34;</span>, description<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;hemoglobin beta fragment 2&#34;</span>),
+</span></span><span style=display:flex><span>    SeqRecord(Seq(<span style=color:#e6db74>&#34;AGGTTCTTTGAGTCCTTTGGGGATCTGTCCACTCCTGATGCTGTTATGGGCAACCCTAAG&#34;</span>),
+</span></span><span style=display:flex><span>              id<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;seq003&#34;</span>, description<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;hemoglobin beta fragment 3&#34;</span>),
+</span></span><span style=display:flex><span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write to stdout in FASTA format</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio <span style=color:#f92672>import</span> SeqIO
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> sys
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;=== FASTA output ===&#34;</span>)
+</span></span><span style=display:flex><span>SeqIO<span style=color:#f92672>.</span>write(sequences, sys<span style=color:#f92672>.</span>stdout, <span style=color:#e6db74>&#34;fasta&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Write to file</span>
+</span></span><span style=display:flex><span>output_file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;/tmp/output.fasta&#34;</span>
+</span></span><span style=display:flex><span>count <span style=color:#f92672>=</span> SeqIO<span style=color:#f92672>.</span>write(sequences, output_file, <span style=color:#e6db74>&#34;fasta&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>Wrote </span><span style=color:#e6db74>{</span>count<span style=color:#e6db74>}</span><span style=color:#e6db74> sequences to </span><span style=color:#e6db74>{</span>output_file<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Read it back to verify</span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>=== Read back ===&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> record <span style=color:#f92672>in</span> SeqIO<span style=color:#f92672>.</span>parse(output_file, <span style=color:#e6db74>&#34;fasta&#34;</span>):
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;</span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>record<span style=color:#f92672>.</span>seq[:<span style=color:#ae81ff>30</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>... (</span><span style=color:#e6db74>{</span>len(record<span style=color:#f92672>.</span>seq)<span style=color:#e6db74>}</span><span style=color:#e6db74> bp)&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>remove(output_file)
+</span></span></code></pre></div><p>We used Bio.SeqIO.write() to output sequences and built a simple format converter. Writing clean output files is as important as reading input.</p><p><strong>AI version</strong> (<code>ch04_ai_03.py</code>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#75715e>#!/usr/bin/env python3</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> os
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio.SeqRecord <span style=color:#f92672>import</span> SeqRecord
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio.Seq <span style=color:#f92672>import</span> Seq
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> Bio <span style=color:#f92672>import</span> SeqIO
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>from</span> openai <span style=color:#f92672>import</span> OpenAI
+</span></span><span style=display:flex><span>    client <span style=color:#f92672>=</span> OpenAI(api_key<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_API_KEY&#34;</span>, <span style=color:#e6db74>&#34;&#34;</span>), base_url<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_BASE_URL&#34;</span>, <span style=color:#e6db74>&#34;https://openrouter.ai/api/v1&#34;</span>))
+</span></span><span style=display:flex><span>    AI_AVAILABLE <span style=color:#f92672>=</span> <span style=color:#66d9ef>True</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>ImportError</span>:
+</span></span><span style=display:flex><span>    AI_AVAILABLE <span style=color:#f92672>=</span> <span style=color:#66d9ef>False</span>
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#34;Note: Install openai package for AI features</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>ask_ai</span>(prompt: str) <span style=color:#f92672>-&gt;</span> str:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> AI_AVAILABLE:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;(AI not available)&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> client<span style=color:#f92672>.</span>chat<span style=color:#f92672>.</span>completions<span style=color:#f92672>.</span>create(model<span style=color:#f92672>=</span>os<span style=color:#f92672>.</span>environ<span style=color:#f92672>.</span>get(<span style=color:#e6db74>&#34;OPENAI_MODEL&#34;</span>, <span style=color:#e6db74>&#34;google/gemini-2.5-flash&#34;</span>), messages<span style=color:#f92672>=</span>[{<span style=color:#e6db74>&#34;role&#34;</span>: <span style=color:#e6db74>&#34;user&#34;</span>, <span style=color:#e6db74>&#34;content&#34;</span>: prompt}], temperature<span style=color:#f92672>=</span><span style=color:#ae81ff>0.3</span>)<span style=color:#f92672>.</span>choices[<span style=color:#ae81ff>0</span>]<span style=color:#f92672>.</span>message<span style=color:#f92672>.</span>content
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sequences <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    SeqRecord(Seq(<span style=color:#e6db74>&#34;ATGGTGCATCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAAC&#34;</span>), id<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;seq001&#34;</span>, description<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;hemoglobin beta fragment 1&#34;</span>),
+</span></span><span style=display:flex><span>    SeqRecord(Seq(<span style=color:#e6db74>&#34;GTGGATGAAGTTGGTGGTGAGGCCCTGGGCAGGCTGCTGGTGGTCTACCCTTGGACCCAG&#34;</span>), id<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;seq002&#34;</span>, description<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;hemoglobin beta fragment 2&#34;</span>),
+</span></span><span style=display:flex><span>    SeqRecord(Seq(<span style=color:#e6db74>&#34;AGGTTCTTTGAGTCCTTTGGGGATCTGTCCACTCCTGATGCTGTTATGGGCAACCCTAAG&#34;</span>), id<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;seq003&#34;</span>, description<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;hemoglobin beta fragment 3&#34;</span>),
+</span></span><span style=display:flex><span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>output_file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;/tmp/output.fasta&#34;</span>
+</span></span><span style=display:flex><span>SeqIO<span style=color:#f92672>.</span>write(sequences, output_file, <span style=color:#e6db74>&#34;fasta&#34;</span>)
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;Wrote </span><span style=color:#e6db74>{</span>len(sequences)<span style=color:#e6db74>}</span><span style=color:#e6db74> sequences to </span><span style=color:#e6db74>{</span>output_file<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>seq_text <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span><span style=color:#f92672>.</span>join(<span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;  </span><span style=color:#e6db74>{</span>r<span style=color:#f92672>.</span>id<span style=color:#e6db74>}</span><span style=color:#e6db74>: </span><span style=color:#e6db74>{</span>r<span style=color:#f92672>.</span>seq<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#66d9ef>for</span> r <span style=color:#f92672>in</span> sequences)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>--- AI: What can we do with these sequences? ---</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>)
+</span></span><span style=display:flex><span>result <span style=color:#f92672>=</span> ask_ai(
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;I wrote </span><span style=color:#e6db74>{</span>len(sequences)<span style=color:#e6db74>}</span><span style=color:#e6db74> DNA sequences to a FASTA file:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>{</span>seq_text<span style=color:#e6db74>}</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;As a bioinformatics instructor, suggest:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;1. What experiments could a student design with these sequences?</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;2. What databases should they search? (BLAST, Ensembl, etc.)</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;3. If these are fragments of the same gene, what&#39;s the next step to assemble them?</span><span style=color:#ae81ff>\n\n</span><span style=color:#e6db74>&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;Give 3 concrete next steps a freshman could follow.&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>print(result)
+</span></span><span style=display:flex><span>os<span style=color:#f92672>.</span>remove(output_file)
+</span></span></code></pre></div><p>The AI discusses format choices: when to use FASTA vs. GenBank, what information is lost in conversion, and best practices for data management.</p><h2 id=chapter-summary>Chapter Summary</h2><p>This chapter covered biological data formats and BioPython. Parsing GenBank, extracting features, and writing sequences to files.</p><p>The vanilla scripts gave you hands-on experience with the core techniques. The AI scripts showed how LLMs can interpret, explain, and extend your analysis. Together, they prepare you for real-world bioinformatics work where code and AI work side by side.</p></article></main></div><footer style="border-top:1px solid #e2e8f0;padding:1.5rem 3rem;margin-top:4rem;text-align:center"><p>Bioinformatics with AI • Dr. Cary Woods • Envoi Publishing</p></footer></body></html>

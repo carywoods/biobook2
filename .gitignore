@@ -1,5 +1,5 @@
-# Hugo build output
-public/
+# Hugo build output — committed so Coolify Static pack serves it prebuilt
+# public/
 resources/_gen/
 
 # Lock/temp
