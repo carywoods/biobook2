@@ -1,0 +1,7 @@
+baseURL = "https://carywoods.dev/biobook"
+languageCode = "en-us"
+title = "Bioinformatics with AI"
+theme = "bioinformatics-book-theme"
+
+[markup.goldmark.renderer]
+  unsafe = true

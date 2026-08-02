@@ -1,0 +1,20 @@
+# Hugo build output
+public/
+resources/_gen/
+
+# Lock/temp
+.hugo_build.lock
+
+# Local staging of published output
+staging/
+
+# Logs & OS cruft
+*.log
+.DS_Store
+
+# Editor
+*.swp
+*~
+.idea/
+# Stray 9-byte placeholder, not a real theme
+themes/*.zip

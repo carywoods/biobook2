@@ -1,0 +1,17 @@
+# Build artifacts - never copy into image
+public/
+resources/_gen/
+.hugo_build.lock
+
+# Keep the image lean
+staging/
+scripts/
+*.log
+.DS_Store
+
+# Git (kept small on purpose; not needed at build)
+.git/
+
+# Editor/OS cruft
+*.swp
+*~

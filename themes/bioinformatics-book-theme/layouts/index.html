@@ -1,0 +1,29 @@
+{{ define "main" }}
+<div class="max-w-4xl mx-auto px-6 py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ .Title }}</h1>
+  
+  <p class="lead text-xl text-gray-600 mb-8">Bioinformatics with AI • Dr. Cary Woods</p>
+
+  <div class="chapters-grid">
+    {{ range first 15 (where .Site.Pages "Type" "chapter") }}
+    <div class="chapter-card">
+      <h3><a href="{{ .RelPermalink }}" class="text-blue-600 hover:text-blue-700 transition-colors">{{ .Title }}</a></h3>
+      {{ if .Params.description }}
+      <p class="text-gray-500 text-sm mt-1">{{ .Description }}</p>
+      {{ end }}
+    </div>
+    {{ end }}
+  </div>
+
+  <footer class="mt-16 border-t border-gray-200 pt-8 text-center text-gray-500">
+    <p>Bioinformatics with AI by Dr. Cary Woods • Envoi Publishing</p>
+    <a href="https://github.com/carywoods/biobook" class="text-blue-600 hover:underline text-sm mt-2 inline-block">View on GitHub</a>
+  </footer>
+</div>
+
+<style>
+.chapters-grid { display: grid; gap: 1.5rem; }
+.chapter-card { background: white; border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #0ea5e9; }
+.chapter-card h3 { margin-top: 0; font-size: 1.1rem; }
+</style>
+{{ end }}
