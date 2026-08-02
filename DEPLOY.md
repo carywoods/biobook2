@@ -1,23 +1,25 @@
-# Deploying this Hugo documentation site (Coolify standard)
+# Deploying this Hugo documentation site (Coolify — static)
 
-This is the organization's **standard method** for publishing documentation sites:
-a multi-stage Dockerfile builds the static Hugo output, and nginx serves it.
-Deploy via Coolify (no manual server steps).
-
-## Files
-- `Dockerfile` — Stage 1 builds with `klakegg/hugo:0.131.0-ext-alpine`, Stage 2 serves with `nginx:1.27-alpine`. Runs `hugo --minify`.
-- `nginx.conf` — static-file serving with cache headers and pretty URLs (`/foo/` → `/foo/index.html`).
-- `.dockerignore` — keeps build artifacts (`public/`, `resources/`, `.hugo_build.lock`) and staging out of the image.
+This is the organization's **standard method** for publishing Hugo documentation sites:
+serve the built static output directly — no Dockerfile needed.
 
 ## Deploy in Coolify
-1. Push this repo to GitHub (e.g. `carywoods/biobook-hugo`).
+1. Push this repo to GitHub (`carywoods/biobook2`).
 2. Coolify → New Resource → application → point at the repo.
-3. Set the port to **80**.
-4. If the site should render under a path/domain other than the default in `hugo.toml`
-   (default `https://carywoods.dev/biobook`), add a build argument:
-   `BASEURL=https://your.domain/path`.
-5. Deploy. Coolify builds the image and routes traffic to nginx on port 80.
+3. Build pack: **Static** (Coolify auto-detects Hugo).
+4. Output directory: **`public`** (where `hugo` writes the site).
+5. Set the domain (e.g. `carywoods.dev/biobook`).
+6. Deploy.
 
-## Verify
-- `docker build -t biobook .` builds without error.
-- `hugo --minify` locally produces a clean `public/` before pushing.
+Coolify runs the Hugo build itself and serves `public/` with its own server,
+wiring the port automatically. No Dockerfile, no nginx, no build args.
+
+## Local preview
+```bash
+hugo server
+```
+
+## Note on baseURL
+`hugo.toml` sets `baseURL = "https://carywoods.dev/biobook"`. Hugo renders
+root-relative paths (`/biobook/...`), so set the same domain/path in Coolify so
+links resolve. If serving at a bare domain, change/baseURL override accordingly.
